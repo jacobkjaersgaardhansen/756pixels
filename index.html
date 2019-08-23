@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+	<meta charset="utf-8">
+	<head>
+		<title>
+			756pixels.com
+		</title>
+	</head>
+	<style>
+	
+	html {
+		text-align: center;
+	}
+	
+	body {
+		/*display: inline-block;*/
+    	margin: 0 auto;
+    	text-align: center;
+	}
+	
+	div {
+	  position: absolute;
+	  width: 20px;
+	  height: 20px;
+	  border: solid 1px #fff;
+	}	
+
+	</style>
+	<body style="vertical-align:middle;font-family:Helvetica Neue;font-size:36px;font-weight:bold;color:#aaa;">
+		756 pixels
+		<br />
+		<br />
+		<div class="container">
+		</div>
+		
+		<script src="https://d3js.org/d3.v5.js"></script>
+		<script>
+	
+		var z = 20,
+		    x = 800 / z,
+		    y = 500 / z;
+			
+		var pageWidth = document.body.clientWidth;
+
+		d3.select(".container").selectAll("div")
+		    .data(d3.range(x * y))
+		  .enter().append("div")
+		    .style("transform", function(d) { return "translate(" + (d % x) * z + "px, " + Math.floor(d / x) * z + "px)"; })
+		    .style("background-color", function(d) { return d3.hsl(d % x / x * 360, 1, Math.floor(d / x) / y); })
+		    .on("mouseover", mouseover);
+		
+		d3.select("div.container").style("left",Math.max(0,(pageWidth - x*z)/2) + "px");
+		
+		function mouseover(d) {
+		  d3.select(this)
+		      .style("pointer-events", "none")
+		      .raise()
+		    .transition()
+		      .duration(750)
+		      .style("transform", "translate(480px, 240px) scale(20) rotate(180deg)")
+		    .transition()
+		      .delay(1500)
+		      .style("transform", "translate(480px, 240px) scale(0.01)")
+		      .remove();
+		}
+		</script>
+		
+	</body>
+</html>
