@@ -1,0 +1,88 @@
+<html>
+    <head>
+            <link rel="stylesheet" type="text/css" href="https://bootswatch.com/4/slate/bootstrap.min.css">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        <p id='peerid'>You haven't got assigned any ID yet.</p>
+
+        <h4>Your friend's ID</h4>
+        <div class="form-group has-success">
+            <input type="text" placeholder="Your friend's ID here" class="form-control" id="inputPeerID" tabindex="1">
+            <!--<button type="submit" class="btn btn-primary" onclick="connect()">Connect</button>-->
+        </div>
+        
+        <h4>Send messages</h4>
+        <div class="form-group">
+                <input type="text" class="form-control" placeholder="Your message here" id="inputMessage" tabindex="2" disabled>
+                <!--<button type="submit" class="btn btn-primary" id='sendBtn' onclick="send()" disabled>Send</button>-->
+        </div>
+        
+        <h4>Received messages</h4>
+        <ul class="list-group" id='recmes'>
+        </ul>
+        
+        <script src="https://unpkg.com/peerjs@1.0.0/dist/peerjs.min.js"></script>
+        
+        <script>
+            var peer = new Peer();
+            var c; // global variable storing the connection.
+
+            document.getElementById('inputPeerID').addEventListener("keyup", e => {
+                if (e.keyCode === 13) {
+                    connect();
+                }
+            });
+
+            document.getElementById('inputMessage').addEventListener("keyup", e => {
+                if (e.keyCode === 13) {
+                    send();
+                }
+            });
+        
+            peer.on('open', id => {
+                document.getElementById('peerid').innerHTML = `Your ID is <b>${id}</b>. Share it with a friend to connect.`;
+            });
+
+            peer.on('error', err => {
+			    alert(err)
+		    });
+            
+            peer.on('connection', d => {
+                c = d;
+                c.on('open', () => {
+                    receiver(c);
+                })
+            });
+
+            function connect(){
+                var remotePeerID = document.getElementById('inputPeerID').value;
+                c = peer.connect(remotePeerID);
+                c.on('open', () => {
+                    receiver(c);
+                });
+            }
+
+            function send(){
+                var inputMessage = document.getElementById('inputMessage');
+                c.send(inputMessage.value);
+                inputMessage.value = "";
+            }
+
+            function receiver(c){
+                document.getElementById('inputPeerID').setAttribute('value', c.peer);
+                document.getElementById('inputPeerID').setAttribute('class', 'form-control is-valid');
+                document.getElementById('inputMessage').disabled = false;
+                document.getElementById('inputMessage').focus()
+                //document.getElementById('sendBtn').disabled = false;
+                c.on('data', d => {
+                    var node = document.createElement("li");
+                    node.setAttribute('class','list-group-item d-flex justify-content-between align-items-center');
+                    var textnode = document.createTextNode(d);
+                    node.appendChild(textnode);
+                    document.getElementById("recmes").appendChild(node);
+                });
+            }
+        </script>
+    </body>
+</html>
